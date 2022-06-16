@@ -1,6 +1,6 @@
 //Import React (Native)
 import React, { useEffect, useState } from 'react'
-import { FlatList, Text, View, Image, TouchableOpacity } from 'react-native'
+import { FlatList, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native'
 
 //Import navigation to get user from search
 import { useRoute } from '@react-navigation/native';
@@ -114,7 +114,7 @@ export default function UserProfileScreen() {
     const renderEntity = ({ item }) => {
         console.log(isFollow)
         return (
-            <View style={styles.entityContainer}>
+            <ScrollView style={styles.entityContainer}>
                 <Text style={styles.entityTitle}>
                     {item.title}
                 </Text>
@@ -127,14 +127,14 @@ export default function UserProfileScreen() {
                     // Evite les bugs d'affichage sur iOS
                     <Text>Pas d'image</Text>
                 )}
-            </View>
+            </ScrollView>
         )
     }
 
 
     //Return a view (all posts)
     return (
-        <View style={styles.listContainer}>
+        <ScrollView style={styles.listContainer}>
             <View>
                 <Text style={styles.title}>
                     Publications de {userName}
@@ -147,6 +147,6 @@ export default function UserProfileScreen() {
                 keyExtractor={(item) => item.id}
                 removeClippedSubviews={true}
             />
-        </View>
+        </ScrollView>
     )
 }

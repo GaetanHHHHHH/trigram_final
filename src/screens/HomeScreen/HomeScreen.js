@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FlatList, Text, TouchableOpacity, View, Image } from 'react-native'
+import { FlatList, Text, TouchableOpacity, View, Image, ScrollView } from 'react-native'
 import styles from './styles';
 import { firebase } from '../../firebase/config'
 import { useNavigation } from '@react-navigation/native';
@@ -44,7 +44,7 @@ export default function HomeScreen(props) {
     const renderEntity = ({ item }) => {
         console.log(item)
         return (
-            <View style={styles.entityContainer}>
+            <ScrollView style={styles.entityContainer}>
                 <Text style={styles.entityText}>
                     {item.title}
                 </Text>
@@ -60,13 +60,13 @@ export default function HomeScreen(props) {
                     // Evite les bugs d'affichage sur iOS
                     <Text>Pas d'image</Text>
                 )}
-            </View>
+            </ScrollView>
         )
     }
 
     return (
 
-        <View style={styles.listContainer}>
+        <ScrollView style={styles.listContainer}>
             <View style={styles.buttonTitle}>
                 <Text style={styles.title}>
                     Bienvenue {userName} !
@@ -85,6 +85,6 @@ export default function HomeScreen(props) {
                 renderItem={renderEntity}
                 keyExtractor={(item) => item._id}
             />
-        </View>
+        </ScrollView>
     )
 }
