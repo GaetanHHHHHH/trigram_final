@@ -30,23 +30,21 @@ export default function UserProfileScreen() {
 
     const [isFollow, setisFollow] = useState(false);
     const [followList, setFollowList] = useState([]);
+    
+    const isNotUserID = (currentValue) => currentValue !== userID;
 
 
     //Get following list for the currently logged user
     const getFollowing = async () => {
         var db = firebase.firestore()
-        let followedPersons = following2
+        //console.log(following2.filter(isNotUserID));     
         if (following2.includes(userID)) {
-            following2.pop(userID)
+            const followlist = following2.filter(isNotUserID);
             setisFollow(false);
-            console.log("Personne unfollowed !")
-            console.log(following2)
-            db.collection("users").doc(ownID).update({ following: following2 });
+            db.collection("users").doc(ownID).update({ following: followlist });
         } else {
             following2.push(userID)
             setisFollow(true);
-            console.log("Personne followed !")
-            console.log(following2)
             db.collection("users").doc(ownID).update({ following: following2 });
         }
         []
@@ -86,9 +84,9 @@ export default function UserProfileScreen() {
                             setisFollow(true);
                         } else {
                             setisFollow(false);
-                    }
+                        }
                     });
-            },
+                },
                 error => {
                     console.log(error)
                 },
@@ -96,57 +94,106 @@ export default function UserProfileScreen() {
     }, [])
 
 
-    const renderFollowText = () => {
-        if (isFollow) return <TouchableOpacity style={styles.button} onPress={() => getFollowing()}>
-            <Text style={styles.buttonText}>
-                Unfollow
-            </Text>
-        </TouchableOpacity>
-        else return (<TouchableOpacity style={styles.button} onPress={() => getFollowing()}>
-            <Text style={styles.buttonText}>
-                Follow
-            </Text>
-        </TouchableOpacity>);
+    function removeItemFromArr(arr, value) { //barbaric, but it works -- removes like
+        var index = arr.indexOf(value);
+        if (index > -1) {
+            arr.splice(index, 1);
+        }
+        return arr;
     }
 
 
-    //Render all his posts on the page
-    const renderEntity = ({ item }) => {
-        console.log(isFollow)
+    const likeTweet = () => { //hyper barbaric, but again, it works
+        //Define array for likes
+        let likes = []
+
+        if (!item.likes) {
+            console.log("No likes")
+            // likes.push(ownID)
+        }
+        else {
+            console.log("Likes")
+            // likes = tweet.likes
+            // if (!likes.includes(ownID)) {
+            //     likes.push(ownID)
+            // }
+            // else {
+            //     removeItemFromArr(likes, ownID)
+        }
+        // }
+        // const tweetRef = app.database().ref('Tweets').child(tweet.id); //need the id to make update
+        // tweetRef.update({   //gets id from home (line 50)
+        //     likes: likes
+        // })
+    }
+
+    const renderLikeText = () => { //G - R
+        // if (item.userLike) 
+        return <TouchableOpacity style={styles.button} onPress={() => likeTweet()}>
+            <Text style={styles.buttonText}>
+                Unlike
+            </Text>
+        </TouchableOpacity>
+        // else return (<TouchableOpacity style={styles.button} onPress={() => likeTweet()}>
+        //     <Text style={styles.buttonText}>
+        //         Like
+        //     </Text>
+        // </TouchableOpacity>);
+    }
+
+
+        const renderFollowText = () => {
+            if (isFollow) return <TouchableOpacity style={styles.button} onPress={() => getFollowing()}>
+                <Text style={styles.buttonText}>
+                    Unfollow
+                </Text>
+            </TouchableOpacity>
+            else return (<TouchableOpacity style={styles.button} onPress={() => getFollowing()}>
+                <Text style={styles.buttonText}>
+                    Follow
+                </Text>
+            </TouchableOpacity>);
+        }
+
+
+        //Render all his posts on the page
+        const renderEntity = ({ item }) => {
+            console.log(isFollow)
+            return (
+                <ScrollView style={styles.entityContainer}>
+                    <Text style={styles.entityTitle}>
+                        {item.title}
+                    </Text>
+                    <Text style={styles.entityText}>
+                        {item.text}
+                    </Text>
+                    {item.image ? (
+                        <Image style={{ width: '300px', height: '300px' }} source={{ uri: item.image }}></Image>
+                    ) : (
+                        // Evite les bugs d'affichage sur iOS
+                        <Text>Pas d'image</Text>
+                    )}
+                    {renderLikeText()}
+                </ScrollView>
+            )
+        }
+
+
+        //Return a view (all posts)
         return (
-            <ScrollView style={styles.entityContainer}>
-                <Text style={styles.entityTitle}>
-                    {item.title}
-                </Text>
-                <Text style={styles.entityText}>
-                    {item.text}
-                </Text>
-                {item.image ? (
-                    <Image style={{ width: '300px', height: '300px' }} source={{ uri: item.image }}></Image>
-                ) : (
-                    // Evite les bugs d'affichage sur iOS
-                    <Text>Pas d'image</Text>
-                )}
+            <ScrollView style={styles.listContainer}>
+                <View>
+                    <Text style={styles.title}>
+                        Publications de {userName}
+                    </Text>
+                    {renderFollowText()}
+                </View>
+                <FlatList
+                    data={entities}
+                    renderItem={renderEntity}
+                    keyExtractor={(item) => item.id}
+                    removeClippedSubviews={true}
+                />
             </ScrollView>
         )
     }
-
-
-    //Return a view (all posts)
-    return (
-        <ScrollView style={styles.listContainer}>
-            <View>
-                <Text style={styles.title}>
-                    Publications de {userName}
-                </Text>
-                {renderFollowText()}
-            </View>
-            <FlatList
-                data={entities}
-                renderItem={renderEntity}
-                keyExtractor={(item) => item.id}
-                removeClippedSubviews={true}
-            />
-        </ScrollView>
-    )
-}
