@@ -27,12 +27,15 @@ export default function UserProfileScreen() {
     //Create constant for follow button
     const ownID = firebase.auth().currentUser.uid;
     const [following2, setFollowing2] = useState([]);
+    // const [entityID, setEntityID] = useState("");
 
     const [isFollow, setisFollow] = useState(false);
+    const [isLiked, setisLiked] = useState(false);
     const [followList, setFollowList] = useState([]);
     
     const isNotUserID = (currentValue) => currentValue !== userID;
 
+    const [hasLike, setHasLike] = useState(false);
 
     //Get following list for the currently logged user
     const getFollowing = async () => {
@@ -93,7 +96,6 @@ export default function UserProfileScreen() {
             )
     }, [])
 
-
     function removeItemFromArr(arr, value) { //barbaric, but it works -- removes like
         var index = arr.indexOf(value);
         if (index > -1) {
@@ -102,63 +104,99 @@ export default function UserProfileScreen() {
         return arr;
     }
 
-
-    const likeTweet = () => { //hyper barbaric, but again, it works
-        //Define array for likes
-        let likes = []
-
-        if (!item.likes) {
-            console.log("No likes")
-            // likes.push(ownID)
+    //add a like to the post
+    const addLike = async (entityID) => {
+        var db = firebase.firestore()
+        var docRef = db.collection("entities").doc(entityID)
+        docRef.get().then(function (doc) {
+            if (doc.exists) {
+                const entity = doc.data()
+                const likes = entity.likes
+                if (likes.includes(ownID)) {
+                    const newLikes = removeItemFromArr(likes, ownID)
+                    docRef.update({ likes: newLikes })
+                    setisLiked(false);
+                } else {
+                    likes.push(ownID)
+                    docRef.update({ likes: likes })
+                    setisLiked(true);
+                }
+            } else {
+                console.log("No such document!");
+            }
+        }).catch(function (error) {
+            console.log("Error getting document:", error);
         }
-        else {
-            console.log("Likes")
-            // likes = tweet.likes
-            // if (!likes.includes(ownID)) {
-            //     likes.push(ownID)
-            // }
-            // else {
-            //     removeItemFromArr(likes, ownID)
-        }
-        // }
-        // const tweetRef = app.database().ref('Tweets').child(tweet.id); //need the id to make update
-        // tweetRef.update({   //gets id from home (line 50)
-        //     likes: likes
-        // })
+        )
     }
 
-    const renderLikeText = () => { //G - R
-        // if (item.userLike) 
-        return <TouchableOpacity style={styles.button} onPress={() => likeTweet()}>
+    // //check if user has already liked the post
+    // const checkLike = (entityID) => {
+    //     var db = firebase.firestore()
+    //     var docRef = db.collection("entities").doc(entityID)
+    //     docRef.get().then(function (doc) {
+    //         if (doc.exists) {
+    //             const entity = doc.data()
+    //             const likes = entity.likes
+    //             console.log(likes)
+    //             if (likes.includes(ownID)) {
+    //                 return true
+    //             } else {
+    //                 console.log('unliked')
+    //                 return false
+    //             }
+    //         } else {
+    //             console.log("No such document!");
+    //         }
+    //     }).catch(function (error) {
+    //         console.log("Error getting document:", error);
+    //     }
+    //     )
+    // }
+    
+
+    const renderLikeText = (entityID) => {
+        //get entity ID from the post
+        // isLiked = checkLike(entityID)
+        if (isLiked) {
+        return <TouchableOpacity style={styles.button} onPress={() => addLike(entityID)}>
             <Text style={styles.buttonText}>
-                Unlike
+                unlike
             </Text>
         </TouchableOpacity>
-        // else return (<TouchableOpacity style={styles.button} onPress={() => likeTweet()}>
-        //     <Text style={styles.buttonText}>
-        //         Like
-        //     </Text>
-        // </TouchableOpacity>);
+        } else {
+        console.log("not liked yet")
+        return <TouchableOpacity style={styles.button} onPress={() => addLike(entityID)}>
+            <Text style={styles.buttonText}>
+                like
+            </Text>
+        </TouchableOpacity>
+        }
     }
 
 
         const renderFollowText = () => {
-            if (isFollow) return <TouchableOpacity style={styles.button} onPress={() => getFollowing()}>
+            if (isFollow){ return <TouchableOpacity style={styles.button} onPress={() => getFollowing()}>
                 <Text style={styles.buttonText}>
                     Unfollow
                 </Text>
-            </TouchableOpacity>
-            else return (<TouchableOpacity style={styles.button} onPress={() => getFollowing()}>
+            </TouchableOpacity>}
+            else{ return (<TouchableOpacity style={styles.button} onPress={() => getFollowing()}>
                 <Text style={styles.buttonText}>
                     Follow
                 </Text>
             </TouchableOpacity>);
+            }
         }
 
 
         //Render all his posts on the page
         const renderEntity = ({ item }) => {
-            console.log(isFollow)
+            // if(item.likes.includes(ownID)){ 
+            //     setisLiked(true)
+            // }else{
+            //     setisLiked(false)
+            // }
             return (
                 <ScrollView style={styles.entityContainer}>
                     <Text style={styles.entityTitle}>
@@ -173,7 +211,7 @@ export default function UserProfileScreen() {
                         // Evite les bugs d'affichage sur iOS
                         <Text>Pas d'image</Text>
                     )}
-                    {renderLikeText()}
+                        {renderLikeText(item.id)}
                 </ScrollView>
             )
         }

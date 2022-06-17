@@ -35,7 +35,8 @@ export default function NewPost(props) {
                 image: entityImage,
                 authorID: userID,
                 authorName: userName,
-                createdAt: timestamp
+                createdAt: timestamp,
+                likes: []
             };
 
             //Add input to db
