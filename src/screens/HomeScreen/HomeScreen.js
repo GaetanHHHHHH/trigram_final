@@ -9,7 +9,8 @@ export default function HomeScreen(props) {
 
     const [entities, setEntities] = useState([])
 
-    const entityRef = firebase.firestore().collection('entities')
+    const entityRef = firebase.firestore().collection('entities').orderBy("createdAt", "desc")
+    
     const userID = props.extraData.id
     const userName = props.extraData.fullName
     const following = props.extraData.following
@@ -22,7 +23,6 @@ export default function HomeScreen(props) {
         for (let user in following) {
             entityRef
                 .where("authorID", "==", following[user])
-                .orderBy('createdAt', 'desc')
                 .onSnapshot(
                     querySnapshot => {
                         querySnapshot.forEach(doc => {
