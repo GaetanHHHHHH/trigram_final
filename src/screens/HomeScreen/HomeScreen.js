@@ -29,6 +29,10 @@ export default function HomeScreen(props) {
                             const entity = doc.data()
                             entity.id = doc.id
                             newEntities.push(entity)
+                            //sort new entities by createdAt
+                            newEntities.sort((a, b) => {
+                                return b.createdAt - a.createdAt
+                            });
                         });
                         setEntities(newEntities)
                         return
@@ -42,7 +46,7 @@ export default function HomeScreen(props) {
 
 
     const renderEntity = ({ item }) => {
-        console.log(item)
+        console.log("ok");
         return (
             <ScrollView style={styles.entityContainer}>
                 <Text style={styles.entityText}>
