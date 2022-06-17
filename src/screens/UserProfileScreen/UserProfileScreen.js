@@ -130,29 +130,6 @@ export default function UserProfileScreen() {
         )
     }
 
-    // //check if user has already liked the post
-    // const checkLike = (entityID) => {
-    //     var db = firebase.firestore()
-    //     var docRef = db.collection("entities").doc(entityID)
-    //     docRef.get().then(function (doc) {
-    //         if (doc.exists) {
-    //             const entity = doc.data()
-    //             const likes = entity.likes
-    //             console.log(likes)
-    //             if (likes.includes(ownID)) {
-    //                 return true
-    //             } else {
-    //                 console.log('unliked')
-    //                 return false
-    //             }
-    //         } else {
-    //             console.log("No such document!");
-    //         }
-    //     }).catch(function (error) {
-    //         console.log("Error getting document:", error);
-    //     }
-    //     )
-    // }
     
 
     const renderLikeText = (entityID) => {
