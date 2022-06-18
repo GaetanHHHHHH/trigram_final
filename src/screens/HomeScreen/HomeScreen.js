@@ -11,6 +11,7 @@ export default function HomeScreen(props) {
 
     const entityRef = firebase.firestore().collection('entities').orderBy("createdAt", "desc")
     
+    const ownID = firebase.auth().currentUser.uid;
     const userID = props.extraData.id
     const userName = props.extraData.fullName
     const following = props.extraData.following
@@ -18,6 +19,8 @@ export default function HomeScreen(props) {
 
     const navigation = useNavigation()
 
+    const [isLiked, setisLiked] = useState(false)
+    const [hasLike, setHasLike] = useState(false);
 
     useEffect(() => {
         for (let user in following) {
@@ -45,6 +48,63 @@ export default function HomeScreen(props) {
     }, [])
 
 
+
+    //to like and unlike an entity
+    function removeItemFromArr(arr, value) { //barbaric, but it works -- removes like
+        var index = arr.indexOf(value);
+        if (index > -1) {
+            arr.splice(index, 1);
+        }
+        return arr;
+    }
+
+    //add a like to the post
+    const addLike = async (entityID) => {
+        var db = firebase.firestore()
+        var docRef = db.collection("entities").doc(entityID)
+        docRef.get().then(function (doc) {
+            if (doc.exists) {
+                const entity = doc.data()
+                const likes = entity.likes
+                if (likes.includes(ownID)) {
+                    const newLikes = removeItemFromArr(likes, ownID)
+                    docRef.update({ likes: newLikes })
+                    setisLiked(false);
+                } else {
+                    likes.push(ownID)
+                    docRef.update({ likes: likes })
+                    setisLiked(true);
+                }
+            } else {
+                console.log("No such document!");
+            }
+        }).catch(function (error) {
+            console.log("Error getting document:", error);
+        }
+        )
+    }
+
+    
+
+    const renderLikeText = (entityID) => {
+        //get entity ID from the post
+        // isLiked = checkLike(entityID)
+        if (isLiked) {
+        return <TouchableOpacity style={styles.button} onPress={() => addLike(entityID)}>
+            <Text style={styles.buttonText}>
+                unlike
+            </Text>
+        </TouchableOpacity>
+        } else {
+        console.log("not liked yet")
+        return <TouchableOpacity style={styles.button} onPress={() => addLike(entityID)}>
+            <Text style={styles.buttonText}>
+                like
+            </Text>
+        </TouchableOpacity>
+        }
+    }
+
     const renderEntity = ({ item }) => {
         console.log("ok");
         return (
@@ -64,6 +124,7 @@ export default function HomeScreen(props) {
                     // Evite les bugs d'affichage sur iOS
                     <Text>Pas d'image</Text>
                 )}
+                {renderLikeText(item.id)}
             </ScrollView>
         )
     }
