@@ -6,6 +6,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 //Import styles and db
 import styles from './styles';
 import { firebase } from '../../firebase/config'
+import { getTimestamp } from 'react-native-reanimated/lib/reanimated2/core';
 
 //Define loginscreen functions with navigation to link to other screens
 export default function LoginScreen({navigation}) {
@@ -30,7 +31,8 @@ export default function LoginScreen({navigation}) {
 
                 //Get the user in the db
                 const uid = response.user.uid
-                const usersRef = firebase.firestore().collection('users')
+                var db = firebase.firestore()
+                const usersRef = db.collection('users')
                 usersRef
                     .doc(uid)
                     .get()
@@ -41,10 +43,12 @@ export default function LoginScreen({navigation}) {
                             alert("User does not exist anymore.")
                             return;
                         }
-
                         //Assigns user to const and use it to navigate to user's homescreen
                         const user = firestoreDocument.data()
                         navigation.push('HomeScreen', {user})
+                        const lastConnected = firebase.firestore.FieldValue.serverTimestamp();
+                        var docRef = db.collection("users").doc(uid)
+                        docRef.update({ lastConnected: lastConnected })
                     })
                     .catch(error => {
                         alert(error)

@@ -23,7 +23,7 @@ export default function SearchUserScreen() {
     navigation.setOptions({ headerShown: false })
 
     //Define const to track input change and add users to [users]
-    const searchInputChange = () => {
+    useEffect(() => {
         userRef
             //If search value equals a user's fullname, add him to list
             .where("fullName", "==", search)
@@ -41,7 +41,7 @@ export default function SearchUserScreen() {
                     console.log(error)
                 }
             )
-    }
+    })
 
     //Define const to navigate to user's profile and keep track of his identity
     const onUserProfileLinkPress = (user) => {
@@ -82,9 +82,9 @@ export default function SearchUserScreen() {
                 underlineColorAndroid="transparent"
                 autoCapitalize="none"
             />
-            <TouchableOpacity style={styles.button} onPress={searchInputChange}>
+            {/* <TouchableOpacity style={styles.button}>
                 <Text style={styles.buttonText}>Valider</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <FlatList
                 removeClippedSubviews={true}
                 data={users}

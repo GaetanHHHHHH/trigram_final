@@ -10,12 +10,17 @@ import { firebase } from '../../firebase/config'
 //Use navigation to login user if signup is validated
 export default function RegistrationScreen({navigation}) {
 
+    var db = firebase.firestore()
+
     //Set constants for inputs
     const [fullName, setFullName] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const following = []
+    const lastConnected = firebase.firestore.FieldValue.serverTimestamp();
+
+    
 
     //Define const to navigate to login screen (button)
     const onFooterLinkPress = () => {
@@ -40,7 +45,8 @@ export default function RegistrationScreen({navigation}) {
                     id: uid,
                     email,
                     fullName,
-                    following
+                    following,
+                    lastConnected
                 };
                 const usersRef = firebase.firestore().collection('users')
                 usersRef

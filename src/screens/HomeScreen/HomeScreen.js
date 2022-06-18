@@ -15,7 +15,17 @@ export default function HomeScreen(props) {
     const userID = props.extraData.id
     const userName = props.extraData.fullName
     const following = props.extraData.following
+
+    var newPost = false
+    const lastConnected = props.extraData.lastConnected
     let newEntities = []
+
+    const isNewPost = (entity) => {
+        if (entity.createdAt > lastConnected) {
+            return <Text style={styles.alert}>Nouveau post !</Text>
+        }
+    }
+
 
     const navigation = useNavigation()
 
@@ -48,9 +58,8 @@ export default function HomeScreen(props) {
     }, [])
 
 
-
     //to like and unlike an entity
-    function removeItemFromArr(arr, value) { //barbaric, but it works -- removes like
+    function removeItemFromArr(arr, value) { 
         var index = arr.indexOf(value);
         if (index > -1) {
             arr.splice(index, 1);
@@ -109,6 +118,7 @@ export default function HomeScreen(props) {
         console.log("ok");
         return (
             <ScrollView style={styles.entityContainer}>
+                {isNewPost(item)}
                 <Text style={styles.entityText}>
                     {item.title}
                 </Text>

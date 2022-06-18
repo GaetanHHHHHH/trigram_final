@@ -41,6 +41,11 @@ export default StyleSheet.create({
         color: 'white',
         fontSize: 16
     },
+    alert: {
+        fontSize: 20,
+        color: '#FF0000',
+        marginTop: 20
+    },
     listContainer: {
         marginTop: 20,
         padding: 20,
